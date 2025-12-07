@@ -1,0 +1,20 @@
+# requirements.txt
+
+# --- Core API Framework ---
+fastapi                     # The API framework
+uvicorn[standard]           # ASGI server to run FastAPI
+pydantic                    # Data validation and settings management (built into FastAPI)
+
+# --- Data Scraping Dependencies (for /infrastructure/scraper_google.py) ---
+requests                    # For making simple HTTP requests (e.g., to Google Autosuggest)
+beautifulsoup4              # For parsing HTML and scraping SERP data
+
+# --- Google Trends Dependency ---
+pytrends                    # Unofficial but stable library for Google Trends data
+
+# --- Database Dependency (Placeholder for future) ---
+# Choose ONE based on your database preference (e.g., using a non-SQL database like MongoDB)
+# motor                     # Asynchronous driver for MongoDB
+
+# --- Development/Tooling (Optional but Recommended) ---
+pytest                      # For running tests
