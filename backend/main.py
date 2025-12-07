@@ -17,4 +17,4 @@ app.include_router(rank_routes.router, prefix="/api/v1/rank", tags=["Rank Tracki
 def read_root():
     return {"message": "Welcome to the Keyword Ranker API"}
 
-# To run the app (later): uvicorn main:app --reload
+# To run the app (later): uvicorn main:app --reloa
