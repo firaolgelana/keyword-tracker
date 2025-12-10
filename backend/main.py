@@ -1,20 +1,15 @@
-# main.py
 from fastapi import FastAPI
-from app.api import keyword_routes, rank_routes
+from app.api.keyword_routes import router as keyword_router
+from app.api.rank_routes import router as rank_router  
 
-# Initialize the application
 app = FastAPI(
-    title="Keyword Ranker Project",
-    version="1.0.0",
-    description="A simple Keyword Research and Rank Tracking tool."
+    title="SEO Keyword Research & Rank Tracker API",
+    version="1.0.0"
 )
 
-# 1. Include the API Routes
-app.include_router(keyword_routes.router, prefix="/api/v1/keywords", tags=["Keyword Research"])
-app.include_router(rank_routes.router, prefix="/api/v1/rank", tags=["Rank Tracking"])
+app.include_router(keyword_router, prefix="/keywords", tags=["Keyword Research"])
+app.include_router(rank_router, prefix="/rank", tags=["Rank Tracking"])
 
 @app.get("/")
-def read_root():
-    return {"message": "Welcome to the Keyword Ranker API"}
-
-# To run the app (later): uvicorn main:app --reloa
+def root():
+    return {"message": "SEO Keyword & Rank Tracker API is running!"}
