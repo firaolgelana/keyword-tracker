@@ -45,3 +45,22 @@ class Repository:
 
     def get_rank_history_for(self, tracking_id: int, limit: int=100):
         return self._session.query(models.RankHistory).filter_by(tracking_id=tracking_id).order_by(models.RankHistory.checked_at.desc()).limit(limit).all()
+
+    def delete_tracking(self, tracking_id: int) -> bool:
+        tk = self.get_tracking_by_id(tracking_id)
+        if tk:
+            self._session.delete(tk)
+            self._session.commit()
+            return True
+        return False
+
+    def update_tracking(self, tracking_id: int, domain: str, keyword: str, frequency: str) -> Optional[models.TrackingKeyword]:
+        tk = self.get_tracking_by_id(tracking_id)
+        if tk:
+            tk.domain = domain
+            tk.keyword = keyword
+            tk.frequency = frequency
+            self._session.commit()
+            self._session.refresh(tk)
+            return tk
+        return None

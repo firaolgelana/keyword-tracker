@@ -31,3 +31,17 @@ def history(tracking_id: int):
         raise HTTPException(status_code=404, detail="tracking not found")
     histories = repo.get_rank_history_for(tracking_id, limit=200)
     return [{"position": h.position, "checked_at": h.checked_at, "serp_snapshot": h.serp_snapshot} for h in histories]
+
+@router.delete("/track/{tracking_id}")
+def delete_tracking(tracking_id: int):
+    success = service.delete_tracking(tracking_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="tracking not found")
+    return {"message": "deleted"}
+
+@router.put("/track/{tracking_id}")
+def update_tracking(tracking_id: int, req: TrackRequest):
+    tk = service.update_tracking(tracking_id, req.domain, req.keyword, req.frequency)
+    if not tk:
+        raise HTTPException(status_code=404, detail="tracking not found")
+    return {"id": tk.id, "domain": tk.domain, "keyword": tk.keyword, "frequency": tk.frequency}

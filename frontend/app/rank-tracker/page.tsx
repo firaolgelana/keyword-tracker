@@ -5,8 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
 import { Header } from "@/shared/components/header"
-import { TrendingUp, Plus, Eye, Calendar } from "lucide-react"
+import { TrendingUp, Plus, Eye, Calendar, Trash2, Edit } from "lucide-react"
 import Link from "next/link"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/shared/components/ui/dialog"
+import { Label } from "@/shared/components/ui/label"
 
 interface TrackedKeyword {
     id: number
@@ -26,6 +34,13 @@ export default function RankTrackerPage() {
     const [keyword, setKeyword] = useState("")
     const [frequency, setFrequency] = useState("daily")
     const [isSubmitting, setIsSubmitting] = useState(false)
+
+    // Edit/Delete state
+    const [editingTracking, setEditingTracking] = useState<TrackedKeyword | null>(null)
+    const [editDomain, setEditDomain] = useState("")
+    const [editKeyword, setEditKeyword] = useState("")
+    const [editFrequency, setEditFrequency] = useState("daily")
+    const [isUpdating, setIsUpdating] = useState(false)
 
     useEffect(() => {
         fetchTrackings()
@@ -86,6 +101,67 @@ export default function RankTrackerPage() {
             console.error("Submit error:", err)
         } finally {
             setIsSubmitting(false)
+        }
+    }
+    const handleDelete = async (id: number) => {
+        if (!confirm("Are you sure you want to delete this tracked keyword?")) return
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/rank/track/${id}`, {
+                method: "DELETE",
+            })
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            // Remove from list
+            setTrackings(trackings.filter((t) => t.id !== id))
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to delete tracking")
+            console.error("Delete error:", err)
+        }
+    }
+
+    const startEditing = (tracking: TrackedKeyword) => {
+        setEditingTracking(tracking)
+        setEditDomain(tracking.domain)
+        setEditKeyword(tracking.keyword)
+        setEditFrequency(tracking.frequency)
+    }
+
+    const handleUpdate = async () => {
+        if (!editingTracking) return
+        if (!editDomain.trim() || !editKeyword.trim()) return
+
+        setIsUpdating(true)
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/rank/track/${editingTracking.id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    domain: editDomain,
+                    keyword: editKeyword,
+                    frequency: editFrequency,
+                }),
+            })
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            const updated = await response.json()
+
+            // Update list
+            setTrackings(trackings.map((t) => (t.id === updated.id ? updated : t)))
+            setEditingTracking(null)
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to update tracking")
+            console.error("Update error:", err)
+        } finally {
+            setIsUpdating(false)
         }
     }
 
@@ -152,13 +228,15 @@ export default function RankTrackerPage() {
                                         <option value="daily">Daily</option>
                                         <option value="weekly">Weekly</option>
                                         <option value="monthly">Monthly</option>
+                                        <option value="hourly">Hourly</option>
+                                        <option value="minutely">Minutely</option>
                                     </select>
                                 </div>
                             </div>
                             <Button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white"
+                                className="bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white"
                             >
                                 {isSubmitting ? "Adding..." : "Add Tracking"}
                             </Button>
@@ -208,15 +286,33 @@ export default function RankTrackerPage() {
                                                 </span>
                                             </div>
                                         </div>
-                                        <Link href={`/rank-tracker/${tracking.id}`}>
+                                        <div className="flex items-center gap-2">
+                                            <Link href={`/rank-tracker/${tracking.id}`}>
+                                                <Button
+                                                    variant="outline"
+                                                    className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white"
+                                                >
+                                                    <Eye className="w-4 h-4 mr-2" />
+                                                    View History
+                                                </Button>
+                                            </Link>
                                             <Button
-                                                variant="outline"
-                                                className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white"
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-muted-foreground hover:text-white"
+                                                onClick={() => startEditing(tracking)}
                                             >
-                                                <Eye className="w-4 h-4 mr-2" />
-                                                View History
+                                                <Edit className="w-4 h-4" />
                                             </Button>
-                                        </Link>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-muted-foreground hover:text-red-400"
+                                                onClick={() => handleDelete(tracking.id)}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -224,6 +320,64 @@ export default function RankTrackerPage() {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Edit Dialog */}
+            <Dialog open={!!editingTracking} onOpenChange={(open) => !open && setEditingTracking(null)}>
+                <DialogContent className="bg-slate-900 border-slate-800 text-foreground">
+                    <DialogHeader>
+                        <DialogTitle>Edit Tracking</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="edit-domain" className="text-right">
+                                Domain
+                            </Label>
+                            <Input
+                                id="edit-domain"
+                                value={editDomain}
+                                onChange={(e) => setEditDomain(e.target.value)}
+                                className="col-span-3 bg-slate-800 border-slate-700"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="edit-keyword" className="text-right">
+                                Keyword
+                            </Label>
+                            <Input
+                                id="edit-keyword"
+                                value={editKeyword}
+                                onChange={(e) => setEditKeyword(e.target.value)}
+                                className="col-span-3 bg-slate-800 border-slate-700"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="edit-freq" className="text-right">
+                                Frequency
+                            </Label>
+                            <select
+                                id="edit-freq"
+                                value={editFrequency}
+                                onChange={(e) => setEditFrequency(e.target.value)}
+                                className="col-span-3 px-3 py-2 rounded-md bg-slate-800 border border-slate-700 text-foreground"
+                            >
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="hourly">Hourly</option>
+                                <option value="minutely">Minutely</option>
+                            </select>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setEditingTracking(null)} className="border-slate-700 text-foreground hover:bg-slate-800">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleUpdate} disabled={isUpdating} className="bg-cyan-500 hover:bg-cyan-600 text-white">
+                            {isUpdating ? "Saving..." : "Save Changes"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

@@ -20,6 +20,6 @@ def start_scheduler():
     if _scheduler:
         return
     _scheduler = BackgroundScheduler()
-    # Run every day at 08:00 server time (change as needed)
-    _scheduler.add_job(_job_run_all_tracking, 'interval', hours=24, id="rank_tracker_daily", next_run_time=None)
+    # Run every minute to check for due tasks
+    _scheduler.add_job(_job_run_all_tracking, 'interval', minutes=1, id="rank_tracker_tick", next_run_time=None)
     _scheduler.start()
