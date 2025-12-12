@@ -19,6 +19,11 @@ def add_tracking(req: TrackRequest):
     tk = service.add_tracking(req.domain, req.keyword, req.frequency)
     return {"id": tk.id, "domain": tk.domain, "keyword": tk.keyword, "frequency": tk.frequency}
 
+@router.get("/list")
+def list_tracking():
+    trackings = repo.list_tracking()
+    return [{"id": tk.id, "domain": tk.domain, "keyword": tk.keyword, "frequency": tk.frequency, "created_at": tk.created_at} for tk in trackings]
+
 @router.get("/history/{tracking_id}")
 def history(tracking_id: int):
     tk = repo.get_tracking_by_id(tracking_id)
