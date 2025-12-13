@@ -28,3 +28,14 @@ app.include_router(rank_router, prefix="/rank", tags=["Rank Tracking"])
 @app.get("/")
 def root():
     return {"message": "SEO Keyword & Rank Tracker API is running!"}
+
+@app.post("/test-run-tracking")
+def test_run_tracking():
+    """Manually trigger rank tracking for all keywords (for testing)"""
+    from app.services.rank_tracker_service import RankTrackerService
+    from app.infrastructure.database_repository import Repository
+    
+    repo = Repository()
+    service = RankTrackerService(repo)
+    service.run_all_tracking_once()
+    return {"message": "Rank tracking executed"}
