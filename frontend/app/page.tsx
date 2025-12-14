@@ -7,6 +7,7 @@ import { TrendingSearches } from "@/shared/components/trending-searches"
 import { AnalyticsChart } from "@/shared/components/analytics-chart"
 import { RecentQueries } from "@/shared/components/recent-queries"
 import { Header } from "@/shared/components/header"
+import  AnimatedParticlesBg  from "@/shared/components/animated-bg"
 import { useState } from "react"
 
 interface KeywordResult {
@@ -49,21 +50,22 @@ export default function Home() {
     }
   }
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
+      <AnimatedParticlesBg />
       <Header />
 
       {/* Main Hero Section */}
-      <div className="bg-linear-to-b from-slate-100 to-background">
+      <div className="">
         <div className="max-w-6xl mx-auto px-4 py-16 sm:py-24">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-cyan-900" />
-              <span className="text-sm font-bold text-cyan-900">Advanced Search Analytics</span>
+              <Sparkles className="w-5 h-5 text-cyan-400" />
+              <span className="text-sm font-bold text-cyan-400">Advanced Search Analytics</span>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4 tracking-tight">
               Search Intelligence Dashboard
             </h1>
-            <p className="text-lg text-black font-medium max-w-2xl mx-auto">
+            <p className="text-lg text-cyan-1200 max-w-2xl mx-auto">
               Real-time insights into search trends, user behavior, and query performance metrics
             </p>
           </div>
