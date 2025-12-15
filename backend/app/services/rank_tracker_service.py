@@ -1,11 +1,13 @@
-from app.infrastructure.scraper_google import get_serp_positions
+from app.infrastructure.scraper_google import get_serp_positions, get_mock_serp_positions
 from app.infrastructure.database_repository import Repository
 from typing import Optional
+import os
 
 class RankTrackerService:
     def __init__(self, repo: Repository, scraper=None):
         self.repo = repo
-        self.scraper = scraper or get_serp_positions
+        # Use mock scraper by default for now to solve the blocking issue
+        self.scraper = scraper or get_mock_serp_positions
 
     def add_tracking(self, domain: str, keyword: str, frequency: str="daily"):
         return self.repo.add_tracking_keyword(domain=domain, keyword=keyword, frequency=frequency)
@@ -44,6 +46,7 @@ class RankTrackerService:
                     delta = now - last_run
                     
                     freq = (t.frequency or "daily").lower()
+                    
                     if freq == "minutely":
                         should_run = delta >= timedelta(minutes=1)
                     elif freq == "hourly":

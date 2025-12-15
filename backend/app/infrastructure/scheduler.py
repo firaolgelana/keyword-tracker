@@ -8,8 +8,9 @@ logger = logging.getLogger(__name__)
 _scheduler = None
 
 def _job_run_all_tracking():
+    # logger.info("Scheduler Tick: Job started")
     repo = Repository()
-    service = RankTrackerService(repo, None)  # service: repo + scraper (service will import scraper internally)
+    service = RankTrackerService(repo, None)
     try:
         service.run_all_tracking_once()
     except Exception as e:
@@ -21,5 +22,6 @@ def start_scheduler():
         return
     _scheduler = BackgroundScheduler()
     # Run every minute to check for due tasks
-    _scheduler.add_job(_job_run_all_tracking, 'interval', minutes=1, id="rank_tracker_tick", next_run_time=None)
+    _scheduler.add_job(_job_run_all_tracking, 'interval', minutes=1, id="rank_tracker_tick")
     _scheduler.start()
+    logger.info("Rank Tracker Scheduler started")

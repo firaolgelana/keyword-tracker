@@ -17,6 +17,11 @@ def add_tracking(req: TrackRequest):
     if not req.domain or not req.keyword:
         raise HTTPException(status_code=400, detail="domain and keyword required")
     tk = service.add_tracking(req.domain, req.keyword, req.frequency)
+    # Trigger initial check immediately
+    try:
+        service.check_rank_once(tk)
+    except Exception as e:
+        print(f"Initial check failed: {e}")
     return {"id": tk.id, "domain": tk.domain, "keyword": tk.keyword, "frequency": tk.frequency}
 
 @router.get("/list")

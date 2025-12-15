@@ -7,7 +7,7 @@ import { TrendingSearches } from "@/shared/components/trending-searches"
 import { AnalyticsChart } from "@/shared/components/analytics-chart"
 import { RecentQueries } from "@/shared/components/recent-queries"
 import { Header } from "@/shared/components/header"
-import  AnimatedParticlesBg  from "@/shared/components/animated-bg"
+import AnimatedParticlesBg from "@/shared/components/animated-bg"
 import { useState } from "react"
 
 interface KeywordResult {
@@ -51,7 +51,6 @@ export default function Home() {
   }
   return (
     <div className="min-h-screen">
-      <AnimatedParticlesBg />
       <Header />
 
       {/* Main Hero Section */}

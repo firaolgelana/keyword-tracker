@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
 import { Header } from "@/shared/components/header"
+import AnimatedParticlesBg from "@/shared/components/animated-bg"
 import { TrendingUp, Plus, Eye, Calendar, Trash2, Edit } from "lucide-react"
 import Link from "next/link"
 import {
@@ -166,7 +167,7 @@ export default function RankTrackerPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen">
             <Header />
 
             <div className="max-w-6xl mx-auto px-4 py-8">
@@ -225,11 +226,11 @@ export default function RankTrackerPage() {
                                         onChange={(e) => setFrequency(e.target.value)}
                                         className="w-full px-3 py-2 rounded-md bg-slate-800 border border-slate-700 text-foreground"
                                     >
+                                        <option value="minutely">Minutely</option>
+                                        <option value="hourly">Hourly</option>
                                         <option value="daily">Daily</option>
                                         <option value="weekly">Weekly</option>
                                         <option value="monthly">Monthly</option>
-                                        <option value="hourly">Hourly</option>
-                                        <option value="minutely">Minutely</option>
                                     </select>
                                 </div>
                             </div>

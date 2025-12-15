@@ -7,6 +7,7 @@ import { Button } from "@/shared/components/ui/button"
 import { Header } from "@/shared/components/header"
 import { ArrowLeft, TrendingUp, Calendar } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import AnimatedParticlesBg from "@/shared/components/animated-bg"
 import Link from "next/link"
 
 interface RankHistory {
@@ -81,7 +82,7 @@ export default function RankHistoryPage() {
         : null
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen">
             <Header />
 
             <div className="max-w-6xl mx-auto px-4 py-8">
@@ -231,12 +232,12 @@ export default function RankHistoryPage() {
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className={`text-2xl font-bold ${h.position
-                                                        ? h.position <= 10
-                                                            ? 'text-green-400'
-                                                            : h.position <= 30
-                                                                ? 'text-yellow-400'
-                                                                : 'text-orange-400'
-                                                        : 'text-red-400'
+                                                    ? h.position <= 10
+                                                        ? 'text-green-400'
+                                                        : h.position <= 30
+                                                            ? 'text-yellow-400'
+                                                            : 'text-orange-400'
+                                                    : 'text-red-400'
                                                     }`}>
                                                     {h.position ? `#${h.position}` : "—"}
                                                 </div>
@@ -253,10 +254,10 @@ export default function RankHistoryPage() {
                                             </div>
                                             {index > 0 && history[index - 1].position && h.position && (
                                                 <div className={`text-sm font-medium ${history[index - 1].position! - h.position > 0
-                                                        ? 'text-green-400'
-                                                        : history[index - 1].position! - h.position < 0
-                                                            ? 'text-red-400'
-                                                            : 'text-muted-foreground'
+                                                    ? 'text-green-400'
+                                                    : history[index - 1].position! - h.position < 0
+                                                        ? 'text-red-400'
+                                                        : 'text-muted-foreground'
                                                     }`}>
                                                     {history[index - 1].position! - h.position > 0 ? '+' : ''}
                                                     {history[index - 1].position! - h.position}
