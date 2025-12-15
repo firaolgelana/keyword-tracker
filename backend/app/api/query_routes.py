@@ -21,19 +21,19 @@ def add_query(req: AddQueryRequest):
 
 @router.get("/recent")
 def get_recent():
-    try:
-        queries = repo.get_recent_queries(limit=5)
-    except Exception as e:
-        import traceback
-        with open("debug_error.log", "w") as f:
-            f.write(traceback.format_exc())
-        raise e
+    queries = repo.get_recent_queries(limit=5)
+    
     
     # helper to format "X min ago"
     def format_time(dt):
-        now = datetime.datetime.now(dt.tzinfo)
+        if dt.tzinfo is None:
+            # If naive, assume UTC because that's what we likely stored
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        
+        now = datetime.datetime.now(datetime.timezone.utc)
         diff = now - dt
         minutes = int(diff.total_seconds() / 60)
+        
         if minutes < 1:
             return "Just now"
         if minutes < 60:

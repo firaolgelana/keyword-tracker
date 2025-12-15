@@ -99,42 +99,74 @@ def get_serp_positions(keyword: str, domain: str, max_pages: int = 1) -> Dict:
     print(f"DEBUG: Scraper finished. Found: {result['position']}")
     return result
 
-def get_mock_serp_positions(keyword: str, domain: str, max_pages: int = 1) -> Dict:
+def get_serpapi_positions(keyword: str, domain: str, max_pages: int = 1) -> Dict:
     """
-    Returns fake SERP data for testing purposes to bypass Google blocking.
+    Uses SerpApi to get real Google rank data.
     """
-    import random
-    print(f"DEBUG: Mock Scraper for '{keyword}'")
+    try:
+        from serpapi import GoogleSearch
+    except ImportError:
+        return {"position": None, "items": [], "error": "Dependency 'google-search-results' not installed."}
+
+    import os
     
-    # Simulate some fluctuation
-    # Deterministic base pos based on keyword hash? or just random?
-    # Let's make it semi-random so graph looks interesting
-    base_pos = (hash(keyword) % 20) + 1  # 1 to 20
-    fluctuation = random.randint(-2, 2)
-    pos = max(1, min(100, base_pos + fluctuation))
+    api_key = os.getenv("SERP_API_KEY")
+    if not api_key:
+        return {"position": None, "items": [], "error": "Missing SERP_API_KEY. Sign up at serpapi.com to get one."}
+
+    print(f"DEBUG: SerpApi Scraper for '{keyword}' domain '{domain}'")
     
-    result = {
-        "position": pos,
-        "items": []
+    params = {
+      "q": keyword,
+      "location": "United States",
+      "hl": "en",
+      "gl": "us",
+      "google_domain": "google.com",
+      "api_key": api_key,
+      "num": 100 # Fetch top 100 in one go if possible, or paginate
     }
     
-    # Generate fake items
-    for i in range(1, 11):
-        item_pos = i
-        if item_pos == pos:
-            # This is our domain
-            result["items"].append({
-                "position": pos,
-                "title": f"My Site - {keyword}",
-                "href": f"https://{domain}/page/{keyword}",
-                "snippet": f"This is a tracked result for {keyword} on {domain}."
-            })
-        else:
-            result["items"].append({
-                "position": item_pos,
-                "title": f"Competitor {item_pos} for {keyword}",
-                "href": f"https://competitor{item_pos}.com/{keyword}",
-                "snippet": f"Ranking result number {item_pos} for query {keyword}."
-            })
+    try:
+        search = GoogleSearch(params)
+        results = search.get_dict()
+        
+        # Check for error in response
+        if "error" in results:
+            error_msg = results["error"] # e.g. "Google Search: Quota limit reached"
+            print(f"ERROR: SerpApi returned error: {error_msg}")
+            return {"position": None, "items": [], "error": error_msg}
+
+        organic_results = results.get("organic_results", [])
+        
+        found_position = None
+        items = []
+        
+        # Parse results
+        for item in organic_results:
+            pos = item.get("position")
+            title = item.get("title")
+            link = item.get("link")
+            snippet = item.get("snippet")
             
-    return result
+            # Simple structure for our frontend
+            mapped_item = {
+                "position": pos,
+                "title": title,
+                "href": link,
+                "snippet": snippet
+            }
+            items.append(mapped_item)
+            
+            # Check for domain match
+            if domain in link and found_position is None:
+                found_position = pos
+                print(f"DEBUG: SerpApi found match at {pos}")
+        
+        return {
+            "position": found_position,
+            "items": items[:15] # Keep it light for DB
+        }
+        
+    except Exception as e:
+        print(f"ERROR: SerpApi failed: {e}")
+        return {"position": None, "items": [], "error": str(e)}
