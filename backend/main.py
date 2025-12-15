@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.keyword_routes import router as keyword_router
-from app.api.rank_routes import router as rank_router  
+from app.api.rank_routes import router as rank_router
+from app.api.query_routes import router as query_router
 
 app = FastAPI(
     title="SEO Keyword Research & Rank Tracker API",
@@ -24,6 +25,7 @@ app.add_middleware(
 
 app.include_router(keyword_router, prefix="/keywords", tags=["Keyword Research"])
 app.include_router(rank_router, prefix="/rank", tags=["Rank Tracking"])
+app.include_router(query_router, prefix="/queries", tags=["Query Management"])
 
 @app.get("/")
 def root():

@@ -42,6 +42,18 @@ export default function Home() {
 
       const data = await response.json()
       setSearchResults(data)
+
+      // Save to recent queries in background (don't await)
+      fetch("http://127.0.0.1:8000/queries/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query: query,
+          location: "Global", // Mock for now
+          results_count: `${Math.floor(Math.random() * 10)}M+` // Mock for now
+        })
+      }).catch(err => console.error("Failed to save recent query", err))
+
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch results")
       console.error("Search error:", err)

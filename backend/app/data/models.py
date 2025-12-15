@@ -30,3 +30,11 @@ class RankHistory(Base):
     checked_at = Column(DateTime(timezone=True), server_default=func.now())
 
     tracking = relationship("TrackingKeyword", back_populates="histories")
+
+class RecentQuery(Base):
+    __tablename__ = "recent_queries"
+    id = Column(Integer, primary_key=True, index=True)
+    query = Column(String, index=True)
+    location = Column(String, default="Unknown")
+    results_count = Column(String, default="0")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

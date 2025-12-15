@@ -67,3 +67,8 @@ class RankTrackerService:
                 # continue tracking others even if one fails
                 print(f"Error checking rank for {t.keyword}: {e}")
                 continue
+
+    def cleanup_history(self, days: int = 7):
+        count = self.repo.delete_old_history(days)
+        print(f"Cleaned up {count} old history records (older than {days} days)")
+        return count

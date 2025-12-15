@@ -64,3 +64,43 @@ class Repository:
             self._session.refresh(tk)
             return tk
         return None
+
+    def delete_old_history(self, days: int = 7) -> int:
+        from datetime import datetime, timedelta
+        cutoff_date = datetime.now() - timedelta(days=days)
+        deleted_count = self._session.query(models.RankHistory).filter(models.RankHistory.checked_at < cutoff_date).delete()
+        self._session.commit()
+        return deleted_count
+
+    # --- Recent Queries ---
+    def add_recent_query(self, query: str, location: str="Global", results_count: str="0"):
+        # Auto cleanup: ensure we only keep the latest 5 (actually 4 before adding new one, or 5 after)
+        # Strategy: Add new one, then keep top 5
+        rq = models.RecentQuery(query=query, location=location, results_count=results_count)
+        self._session.add(rq)
+        self._session.commit()
+        self._session.refresh(rq)
+        
+        # Cleanup older than 5
+        self.cleanup_recent_queries()
+        
+        return rq
+
+    def get_recent_queries(self, limit: int=5):
+        return self._session.query(models.RecentQuery).order_by(models.RecentQuery.created_at.desc()).limit(limit).all()
+
+    def cleanup_recent_queries(self, keep_limit: int=5):
+        # Find the ID of the 5th most recent item
+        subquery = self._session.query(models.RecentQuery.id)\
+            .order_by(models.RecentQuery.created_at.desc())\
+            .limit(keep_limit).all()
+        
+        if len(subquery) < keep_limit:
+            return 0
+            
+        recent_ids = [r.id for r in subquery]
+        
+        # Delete everything NOT in the recent_ids list
+        deleted = self._session.query(models.RecentQuery).filter(models.RecentQuery.id.notin_(recent_ids)).delete(synchronize_session=False)
+        self._session.commit()
+        return deleted
