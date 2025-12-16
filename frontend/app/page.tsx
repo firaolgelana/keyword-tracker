@@ -16,6 +16,8 @@ interface KeywordResult {
   difficulty: number
 }
 
+import { API_BASE_URL } from "@/shared/lib/config"
+
 export default function Home() {
   const [searchResults, setSearchResults] = useState<KeywordResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -28,7 +30,7 @@ export default function Home() {
     setError(null)
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/keywords/suggest", {
+      const response = await fetch(`${API_BASE_URL}/keywords/suggest`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,7 +46,7 @@ export default function Home() {
       setSearchResults(data)
 
       // Save to recent queries in background (don't await)
-      fetch("http://127.0.0.1:8000/queries/add", {
+      fetch(`${API_BASE_URL}/queries/add`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

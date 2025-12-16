@@ -12,13 +12,15 @@ interface RecentQuery {
   results: string
 }
 
+import { API_BASE_URL } from "@/shared/lib/config"
+
 export function RecentQueries() {
   const [queries, setQueries] = useState<RecentQuery[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchQueries = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/queries/recent")
+      const res = await fetch(`${API_BASE_URL}/queries/recent`)
       if (res.ok) {
         const data = await res.json()
         setQueries(data)

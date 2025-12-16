@@ -23,6 +23,8 @@ interface TrackingInfo {
     frequency: string
 }
 
+import { API_BASE_URL } from "@/shared/lib/config"
+
 export default function RankHistoryPage() {
     const params = useParams()
     const router = useRouter()
@@ -42,7 +44,7 @@ export default function RankHistoryPage() {
         setError(null)
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/rank/history/${trackingId}`)
+            const response = await fetch(`${API_BASE_URL}/rank/history/${trackingId}`)
 
             if (response.status === 404) {
                 setError("Tracking not found")

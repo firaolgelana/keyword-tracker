@@ -25,6 +25,8 @@ interface TrackedKeyword {
     created_at: string
 }
 
+import { API_BASE_URL } from "@/shared/lib/config"
+
 export default function RankTrackerPage() {
     const [trackings, setTrackings] = useState<TrackedKeyword[]>([])
     const [isLoading, setIsLoading] = useState(false)
@@ -52,7 +54,7 @@ export default function RankTrackerPage() {
         setError(null)
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/rank/list")
+            const response = await fetch(`${API_BASE_URL}/rank/list`)
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
@@ -78,7 +80,7 @@ export default function RankTrackerPage() {
         setError(null)
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/rank/track", {
+            const response = await fetch(`${API_BASE_URL}/rank/track`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -108,7 +110,7 @@ export default function RankTrackerPage() {
         if (!confirm("Are you sure you want to delete this tracked keyword?")) return
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/rank/track/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/rank/track/${id}`, {
                 method: "DELETE",
             })
 
@@ -137,7 +139,7 @@ export default function RankTrackerPage() {
 
         setIsUpdating(true)
         try {
-            const response = await fetch(`http://127.0.0.1:8000/rank/track/${editingTracking.id}`, {
+            const response = await fetch(`${API_BASE_URL}/rank/track/${editingTracking.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
