@@ -13,11 +13,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/globe.png",
+        url: "/globe.svg",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/globe.png",
+        url: "/globe.svg",
         media: "(prefers-color-scheme: dark)",
       },
       {
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
         type: "image/svg+xml",
       },
     ],
-    apple: "/globe.png",
+    apple: "/globe.svg",
   },
 }
 
