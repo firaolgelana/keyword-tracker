@@ -13,6 +13,7 @@ from app.infrastructure.scheduler import start_scheduler
 
 @app.on_event("startup")
 def on_startup():
+    print(f"Allowed origins: {origins}")
     start_scheduler()
 
 import os
@@ -41,7 +42,7 @@ app.include_router(query_router, prefix="/queries", tags=["Query Management"])
 
 @app.get("/")
 def root():
-    return {"message": "SEO Keyword & Rank Tracker API is running!"}
+    return {"message": "SEO Keyword & Rank Tracker API is running! (v1.1)"}
 
 @app.post("/test-run-tracking")
 def test_run_tracking():
